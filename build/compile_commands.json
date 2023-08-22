@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/home/peppe289/Desktop/Kernel_Monitor/system_amd/build",
+  "command": "/usr/bin/gcc -g -o CMakeFiles/system_amd.dir/src/main.c.o -c /home/peppe289/Desktop/Kernel_Monitor/system_amd/src/main.c",
+  "file": "/home/peppe289/Desktop/Kernel_Monitor/system_amd/src/main.c",
+  "output": "CMakeFiles/system_amd.dir/src/main.c.o"
+}
+]

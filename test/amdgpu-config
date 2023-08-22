@@ -1,0 +1,5 @@
+power_dpm_force_performance_level = manual
+# config for clock
+pp_dpm_sclk = 
+# config for VRAM clock
+pp_dpm_mclk = 
