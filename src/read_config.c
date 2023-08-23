@@ -97,8 +97,6 @@ static int get_index_config_data(FILE *fp, char *buf, char *config)
     
     collect_config_settings(buf, config, tmp);
 
-    print_info("%s - %s\n", config, tmp);
-
     for (index = 0; index < SIZE_CONFIG_DATA; ++index)
     {
         if (strcmp(tmp, configurable_data[index]) == 0)
@@ -133,15 +131,12 @@ int load_configuration_file(char *path)
         if (buf[0] == '#') continue;
 
         index = get_index_config_data(fp, buf, config);
-        print_info("%d\n", index);
         if (index == -1) continue;
 
         result = set_config_data(index, config);
         if (result == -1)
             print_err("Error to set line %d\n", line);
     }
-
-    print_info("%d", line);
 
     fclose(fp);
     return 0;
