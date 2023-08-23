@@ -1,12 +1,16 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
+#include "utils.h"
+#include "public.h"
 
 /**
  * Referring to the linux kernel we can set various
  * parameters in the power_dpm_force_performance_level node.
- * 
+ *
  * REF: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/drivers/gpu/drm/amd/pm/amdgpu_pm.c#n164
- * 
+ *
  * DOC: power_dpm_force_performance_level
  *
  * The amdgpu driver provides a sysfs API for adjusting certain power
@@ -64,8 +68,89 @@
  * profile_peak sets all clocks (mclk, sclk, pcie) to the highest levels.
  *
  */
-int set_power_dpm_performance() {
-    
 
+enum power_dpm
+{
+    AUTO = 0,
+    LOW,
+    HIGH,
+    MANUAL,
+    PROFILE_STANDARD,
+    PROFILE_MIN_SCLK,
+    PROFILE_MIN_MCLK,
+    PROFILE_PEAK,
+    POWER_DPM_SIZE,
+};
+
+/**
+ * List of accepted values ​​in the node
+ * /sys/class/drm/card0/device/power_dpm_force_performance_level
+ */
+const char *power_dpm_value[POWER_DPM_SIZE] = {
+    [AUTO] = "auto",
+    [LOW] = "low",
+    [HIGH] = "high",
+    [MANUAL] = "manual",
+    [PROFILE_STANDARD] = "profile_standard",
+    [PROFILE_MIN_SCLK] = "profile_min_sclk",
+    [PROFILE_MIN_MCLK] = "profile_min_mclk",
+    [PROFILE_PEAK] = "profile_peak",
+};
+
+/**
+ * Check if the input setting is valid (present in the accepted values).
+ */
+static int validate_input_power_dpm_performance(const char *setting) {
+    int index;
+
+    for (index = 0; index < POWER_DPM_SIZE; ++index) {
+        if (strcmp(setting, power_dpm_value[index])) {
+            return 0;
+        }
+    }
+
+    return -1;
+}
+
+/**
+ * Set the node setting.
+ * For efficiency before overwriting check the validity and check if that setting
+ * is already set.
+ */
+int set_power_dpm_performance(const char *setting)
+{
+    FILE *fp;
+    char path[128];
+    char buf[20];
+
+    /**
+     * To avoid errors, set the cell values ​​to 0.
+     * The chances of error are nearly impossible, but better to be sure
+     */
+    memset(path, 0, sizeof(path));
+    strcpy(path, "/sys/class/drm/card0/device/");
+    strcat(path, configurable_data[POWER_DPM_FORCE_PERFORMANCE_LEVEL]);
+
+    fp = fopen(path, "r+");
+    if (fp == NULL)
+        return -1;
+
+    fscanf(fp, "%s", buf);
+    if (strcmp(buf, setting) == 0)
+    {
+        fclose(fp);
+        return 0;
+    }
+
+    if (validate_input_power_dpm_performance(setting) != 0) {
+        print_err("Value %s not valid for %s\n", setting, path);
+        return -1;
+    }
+
+    if (fprintf(fp, "%s", setting) < 0) {
+        print_err("Error to write %s in %s\n", setting, path);
+    }
+
+    fclose(fp);
     return 0;
 }

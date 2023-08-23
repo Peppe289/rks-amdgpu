@@ -4,6 +4,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define print_err(...)                     \
+    do                                     \
+    {                                      \
+        fprintf(stderr, "%s: ", __func__); \
+        fprintf(stderr, __VA_ARGS__);      \
+    } while (0);
+
+#define print_info(...)                    \
+    do                                     \
+    {                                      \
+        fprintf(stdout, "%s: ", __func__); \
+        fprintf(stdout, __VA_ARGS__);      \
+    } while (0);
+
 enum config_data
 {
     PP_OD_CLK_VOLTAGE = 0,
@@ -14,12 +28,6 @@ enum config_data
     SIZE_CONFIG_DATA,
 };
 
-const char *configurable_data[] = {
-    [PP_OD_CLK_VOLTAGE] = "pp_od_clk_voltage",
-    [POWER_DPM_FORCE_PERFORMANCE_LEVEL] = "power_dpm_force_performance_level",
-    [PP_DPM_SCLK] = "pp_dpm_sclk",
-    [PP_DPM_MCLK] = "pp_dpm_mclk",
-    [PP_POWER_PROFILE_MODE] = "pp_power_profile_mode",
-};
+extern char *configurable_data[SIZE_CONFIG_DATA];
 
 #endif // _AMD_UTILS_H_
