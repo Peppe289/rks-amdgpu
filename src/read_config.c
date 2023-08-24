@@ -48,7 +48,7 @@ static void collect_config_settings(char *buf, char *config, char *name) {
     k = 0;
     // Do not initialize the index (i). The reading of the previous stream continues.
     for (; i != strlen(buf); ++i) {
-        if (buf[i] == ' ' || buf[i] == '=') continue;
+        if (buf[i] == ' ' || buf[i] == '=' || buf[i] == '\n') continue;
 
         config[k] = buf[i];
         k++;

@@ -104,7 +104,7 @@ static int validate_input_power_dpm_performance(const char *setting) {
     int index;
 
     for (index = 0; index < POWER_DPM_SIZE; ++index) {
-        if (strcmp(setting, power_dpm_value[index])) {
+        if (strcmp(setting, power_dpm_value[index]) == 0) {
             return 0;
         }
     }
@@ -144,11 +144,14 @@ int set_power_dpm_performance(const char *setting)
 
     if (validate_input_power_dpm_performance(setting) != 0) {
         print_err("Value %s not valid for %s\n", setting, path);
+        fclose(fp);
         return -1;
     }
 
     if (fprintf(fp, "%s", setting) < 0) {
         print_err("Error to write %s in %s\n", setting, path);
+        fclose(fp);
+        return -1;
     }
 
     fclose(fp);

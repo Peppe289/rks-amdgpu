@@ -6,7 +6,5 @@
 
 int main(int argc, char **argv)
 {
-
     return load_configuration_file("./../test/amdgpu-config");
-
 }
