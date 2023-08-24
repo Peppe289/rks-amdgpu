@@ -79,7 +79,7 @@ static int set_config_data(int index, char *config) {
         break;
 
     case PP_POWER_PROFILE_MODE:
-
+        ret = pp_power_profile_mode(config);
         break;
     default:
         ret = -1;
