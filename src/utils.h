@@ -1,33 +1,34 @@
-#ifndef _AMD_UTILS_H_
-#define _AMD_UTILS_H_
+#ifndef __RKS_UTILS_H__
+#define __RKS_UTILS_H__
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#define print_err(...)                     \
+#define print_err_func(...)                \
     do                                     \
     {                                      \
         fprintf(stderr, "%s: ", __func__); \
         fprintf(stderr, __VA_ARGS__);      \
     } while (0);
 
-#define print_info(...)                    \
+#define print_info_func(...)               \
     do                                     \
     {                                      \
         fprintf(stdout, "%s: ", __func__); \
         fprintf(stdout, __VA_ARGS__);      \
     } while (0);
 
-enum config_data
-{
-    PP_OD_CLK_VOLTAGE = 0,
-    POWER_DPM_FORCE_PERFORMANCE_LEVEL,
-    PP_DPM_SCLK,
-    PP_DPM_MCLK,
-    PP_POWER_PROFILE_MODE,
-    SIZE_CONFIG_DATA,
-};
+#define print_err(...) fprintf(stderr, __VA_ARGS__);
+#define print_info(...) fprintf(stdout, __VA_ARGS__);
 
-extern char *configurable_data[SIZE_CONFIG_DATA];
+#define validate_alloc(x)                             \
+    do                                                 \
+    {                                                  \
+        if (x == NULL)                                 \
+        {                                              \
+            print_info_func("Error to alloc %s\n", #x); \
+            exit(EXIT_FAILURE);                        \
+        }                                              \
+    } while (0);
 
-#endif // _AMD_UTILS_H_
+#endif
