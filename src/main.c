@@ -84,6 +84,7 @@ static struct node_t *search_for_gpu(void)
     // for search dir
     DIR *d_root;
     struct dirent *dir;
+    char *t_data;
 
     d_root = opendir(def_gpu_path);
     validate_alloc(d_root);
@@ -107,10 +108,10 @@ static struct node_t *search_for_gpu(void)
                 continue;
             }
 
-            amdgpu->data = malloc((path_len + strlen(dir->d_name) + 1) * sizeof(char));
-            memcpy(amdgpu->data, def_gpu_path, strlen(def_gpu_path) + 1);
-            strcat(amdgpu->data, dir->d_name);
-            print_info_func("Save in list %s node\n", amdgpu->data);
+            t_data = malloc((path_len + strlen(dir->d_name) + 1) * sizeof(char));
+            memcpy(t_data, def_gpu_path, strlen(def_gpu_path) + 1);
+            strcat(t_data, dir->d_name);
+            push(&amdgpu, t_data);
         }
     }
 
@@ -118,10 +119,22 @@ static struct node_t *search_for_gpu(void)
     return amdgpu;
 }
 
+static void show_amdgpu_list(struct node_t *_node)
+{
+    while (_node != NULL)
+    {
+        if (_node->data != NULL)
+            print_info_func("Save in list %s node\n", _node->data);
+
+        _node = _node->next;
+    }
+}
+
 int main()
 {
     struct node_t *amdgpu;
     amdgpu = search_for_gpu();
+    show_amdgpu_list(amdgpu);
     destroy_node(&amdgpu);
 
     return EXIT_SUCCESS;

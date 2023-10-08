@@ -4,9 +4,11 @@
 #include "utils.h"
 #include "data_struct.h"
 
-struct node_t *new_node() {
+struct node_t *new_node()
+{
     struct node_t *ret;
     ret = malloc(sizeof(struct node_t));
+    ret->data = NULL;
     ret->next = NULL;
     return ret;
 }
@@ -23,11 +25,13 @@ void push(struct node_t **_node, void *data)
     *_node = new_node;
 }
 
-void *pop(struct node_t **_node) {
+void *pop(struct node_t **_node)
+{
     void *retval = NULL;
-    node_t * next_node = NULL;
+    node_t *next_node = NULL;
 
-    if (*_node == NULL) {
+    if (*_node == NULL)
+    {
         return NULL;
     }
 
@@ -39,13 +43,17 @@ void *pop(struct node_t **_node) {
     return retval;
 }
 
-void destroy_node(struct node_t **_node) {
-    struct node_t* current = *_node;
-    struct node_t* next;
+void destroy_node(struct node_t **_node)
+{
+    struct node_t *current = *_node;
+    struct node_t *next;
 
-    while (current != NULL) {
+    while (current != NULL)
+    {
         next = current->next;
-        free(current->data);
+        if (current->data != NULL)
+            free(current->data);
+
         free(current);
         current = next;
     }
