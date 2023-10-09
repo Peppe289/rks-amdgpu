@@ -8,9 +8,18 @@ typedef struct node_t
 } node_t;
 
 
+typedef struct p_gpu {
+    char *root;
+    char *hwmon;
+} p_gpu;
+
 struct node_t *new_node();
 void push(struct node_t **_node, void *data);
 void *pop(struct node_t **_node);
 void destroy_node(struct node_t **_node);
+
+const char *get_root(struct node_t *_node);
+const char *get_hwmon(struct node_t *_node);
+void free_pgpu(struct p_gpu *data);
 
 #endif // _RKS_DATA_STRUCT_H__

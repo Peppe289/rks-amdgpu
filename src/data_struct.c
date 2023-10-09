@@ -52,7 +52,7 @@ void destroy_node(struct node_t **_node)
     {
         next = current->next;
         if (current->data != NULL)
-            free(current->data);
+            free_pgpu(current->data);
 
         free(current);
         current = next;
