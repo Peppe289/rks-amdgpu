@@ -147,6 +147,7 @@ int main()
     struct node_t *amdgpu;
     amdgpu = search_for_gpu();
     show_amdgpu_list(amdgpu);
+    pwm_control(amdgpu);
     destroy_node(&amdgpu);
 
     return EXIT_SUCCESS;
