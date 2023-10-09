@@ -58,7 +58,10 @@ static int manual_pwm(struct node_t *_node) {
     validate_alloc(fp);
     fscanf(fp, "%d", &buff);
 
-    if (buff == FAN_GPU_MANU) return 0; // already set to manual mode
+    if (buff == FAN_GPU_MANU) {
+        fclose(fp);
+        return 0; // already set to manual mode
+    }
 
     buff = fprintf(fp, "%d", FAN_GPU_MANU); // set to manual mode
     fclose(fp);
