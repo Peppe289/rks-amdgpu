@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
+#include <unistd.h>
 
 #include "data_struct.h"
 #include "utils.h"
@@ -147,7 +148,11 @@ int main()
     struct node_t *amdgpu;
     amdgpu = search_for_gpu();
     show_amdgpu_list(amdgpu);
-    pwm_control(amdgpu);
+    print_info("start with pid: %d\n", getpid());
+    while (1) {
+        pwm_control(amdgpu);
+        sleep(2);
+    }
     destroy_node(&amdgpu);
 
     return EXIT_SUCCESS;
