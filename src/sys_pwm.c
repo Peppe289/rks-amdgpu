@@ -159,15 +159,31 @@ static int set_speed_matrix(struct node_t *_node) {
     return 0;
 }
 
-int pwm_control(struct node_t *_node) {
+int pwm_control(struct node_t *_node)
+{
+    static short int rec = 0;
+    struct node_t *temp = _node;
 
-    if (manual_pwm(_node) < 0) {
-        print_err_func("Error to set manual mode in pwm\n");
-        return 0;
+    if (rec != 0)
+        goto set_gpu;
+
+    for_each_gpu(temp) {
+        if (manual_pwm(_node) < 0) {
+            print_err_func("Error to set manual mode in pwm\n");
+        } else {
+            // if it manages to set at least one node to true then you can continue the program.
+            rec = 1;
+        }
     }
 
-    for_each_gpu(_node)
-        if (set_speed_matrix(_node) < 0)
+    if (rec != 1)
+        return 0;
+
+    temp = _node;
+
+set_gpu:
+    for_each_gpu(temp)
+        if (set_speed_matrix(temp) < 0)
             print_err("Error to set %s node\n", get_root(_node));
     
     return 1;
