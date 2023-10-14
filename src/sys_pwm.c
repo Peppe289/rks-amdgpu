@@ -154,6 +154,7 @@ void pwm_control(struct node_t *_node) {
         exit(-1);
     }
 
-    set_speed_matrix(_node);
+    for_each_gpu(_node)
+        set_speed_matrix(_node);
 }
 

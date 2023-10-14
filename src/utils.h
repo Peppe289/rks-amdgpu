@@ -31,4 +31,6 @@
         }                                              \
     } while (0);
 
+#define for_each_gpu(x) for (; x != NULL; x = x->next)
+
 #endif
