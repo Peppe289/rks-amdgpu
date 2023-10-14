@@ -21,6 +21,6 @@ void destroy_node(struct node_t **_node);
 const char *get_root(struct node_t *_node);
 const char *get_hwmon(struct node_t *_node);
 void free_pgpu(struct p_gpu *data);
-void pwm_control(struct node_t *_node);
+int pwm_control(struct node_t *_node);
 
 #endif // _RKS_DATA_STRUCT_H__

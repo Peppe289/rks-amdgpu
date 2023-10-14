@@ -45,8 +45,11 @@ static char *validate_amdgpu_path(const char *path)
      *
      * N.B. It seems it is possible to have only one hwmonY in this path.
      */
-    d_root = opendir(c_path);
-    validate_alloc(d_root);
+    if ((d_root = opendir(c_path)) == NULL) {
+        print_err("Error to open %s\n", c_path);
+        return NULL;
+    }
+
     while ((dir = readdir(d_root)) != NULL)
     {
         if (strncmp(dir->d_name, "hwmon", strlen("hwmon")) == 0)
@@ -62,8 +65,10 @@ static char *validate_amdgpu_path(const char *path)
     strcpy(hwmon, c_path); // copy path of hwmon for return
     strcat(c_path, "name"); // end create path
 
-    fp = fopen(c_path, "r");
-    validate_alloc(fp);
+    if ((fp = fopen(c_path, "r")) == NULL) {
+        free(hwmon);
+        return NULL;
+    }
 
     fscanf(fp, "%s", s_data);
     fclose(fp);
@@ -93,8 +98,8 @@ static struct node_t *search_for_gpu(void)
     struct p_gpu *t_data;
     char *hwmon;
 
-    d_root = opendir(def_gpu_path);
-    validate_alloc(d_root);
+    if ((d_root = opendir(def_gpu_path)) == NULL)
+        return NULL;
 
     while ((dir = readdir(d_root)) != NULL)
     {
@@ -146,11 +151,14 @@ static void show_amdgpu_list(struct node_t *_node)
 int main()
 {
     struct node_t *amdgpu;
-    amdgpu = search_for_gpu();
+    if ((amdgpu = search_for_gpu()) == NULL) {
+        print_err("Error to init data\n");
+        destroy_node(&amdgpu);
+        exit(-1);
+    }
     show_amdgpu_list(amdgpu);
     print_info("start with pid: %d\n", getpid());
-    while (1) {
-        pwm_control(amdgpu);
+    while (pwm_control(amdgpu)) {
         sleep(2);
     }
     destroy_node(&amdgpu);

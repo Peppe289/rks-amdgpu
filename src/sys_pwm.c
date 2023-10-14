@@ -54,8 +54,11 @@ static int manual_pwm(struct node_t *_node) {
     memcpy(path, get_hwmon(_node), strlen(get_hwmon(_node)) + 1);
     strcat(path, "pwm1_enable"); // for now controll only first node
 
-    fp = fopen(path, "r+");
-    validate_alloc(fp);
+    if ((fp = fopen(path, "r+")) == NULL) {
+        print_err("Error to open %s\n", path);
+        return -1;
+    }
+
     fscanf(fp, "%d", &buff);
 
     if (buff == FAN_GPU_MANU) {
@@ -76,8 +79,9 @@ static int get_thermal(struct node_t *_node) {
     memcpy(path, get_hwmon(_node), strlen(get_hwmon(_node)) + 1);
     strcat(path, "temp1_input"); // for now controll only first node
 
-    fp = fopen(path, "r");
-    validate_alloc(fp);
+    if ((fp = fopen(path, "r")) == NULL)
+        return -1;
+
     fscanf(fp, "%d", &buff);
     fclose(fp);
     return buff;
@@ -124,7 +128,7 @@ static int u_fanspeed(int therm, int index) {
     return m * x + q;
 }
 
-static void set_speed_matrix(struct node_t *_node) {
+static int set_speed_matrix(struct node_t *_node) {
     FILE *fp;
     char path[255];
     int data, therm, index;
@@ -132,7 +136,11 @@ static void set_speed_matrix(struct node_t *_node) {
     memcpy(path, get_hwmon(_node), strlen(get_hwmon(_node)) + 1);
     strcat(path, "pwm1"); // for now controll only first node
 
-    therm = get_thermal(_node); // collect temp information
+    if ((therm = get_thermal(_node)) < 0) {
+        print_err("Error to get thermal info\n"); // collect temp information
+        return -1;
+    }
+
     therm = therm / 1000;
     index = getIndex_Therm(therm, 0); // get index of matrix for set fan
 
@@ -141,20 +149,27 @@ static void set_speed_matrix(struct node_t *_node) {
     data = data * 2.55;
     print_info_func("Set %d percentage with %d temp\n", data, therm);
 
-    fp = fopen(path, "w+");
-    validate_alloc(fp);
+    if ((fp = fopen(path, "w+")) == NULL) {
+        return -1;
+    }
+    
     fprintf(fp, "%d", data);
     fclose(fp);
+
+    return 0;
 }
 
-void pwm_control(struct node_t *_node) {
+int pwm_control(struct node_t *_node) {
 
-    if (manual_pwm(_node) != 0) {
+    if (manual_pwm(_node) < 0) {
         print_err_func("Error to set manual mode in pwm\n");
-        exit(-1);
+        return 0;
     }
 
     for_each_gpu(_node)
-        set_speed_matrix(_node);
+        if (set_speed_matrix(_node) < 0)
+            print_err("Error to set %s node\n", get_root(_node));
+    
+    return 1;
 }
 
