@@ -38,20 +38,34 @@ void free_pgpu(struct p_gpu *data) {
 
 const char *get_root(struct node_t *_node) {
     struct p_gpu *data = _node->data;
-    return data->root;
+
+    if (data != NULL)
+        if (data->root != NULL)
+            return data->root;
+
+    return NULL;
 }
 
 const char *get_hwmon(struct node_t *_node) {
     struct p_gpu *data = _node->data;
-    return data->hwmon;
+
+    if (data != NULL)
+        if (data->hwmon != NULL)
+            return data->hwmon;
+
+    return NULL;
 }
 
 static int manual_pwm(struct node_t *_node) {
     FILE *fp;
     char path[255];
     int buff;
+    char *hwmon = get_hwmon(_node);
 
-    memcpy(path, get_hwmon(_node), strlen(get_hwmon(_node)) + 1);
+    if (hwmon == NULL)
+        return -1;
+
+    memcpy(path, hwmon, strlen(hwmon) + 1);
     strcat(path, "pwm1_enable"); // for now controll only first node
 
     if ((fp = fopen(path, "r+")) == NULL) {
