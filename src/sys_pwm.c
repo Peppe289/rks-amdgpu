@@ -200,7 +200,7 @@ int pwm_control(struct node_t *_node)
 set_gpu:
     for_each_gpu(temp)
         if (set_speed_matrix(temp) < 0)
-            print_err("Error to set %s node\n", get_root(_node));
+            print_err("Error to set %s node\n", get_root(temp));
     
     return 1;
 }
