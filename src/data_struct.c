@@ -4,25 +4,22 @@
 #include "utils.h"
 #include "data_struct.h"
 
-struct node_t *new_node()
-{
-    struct node_t *ret;
-    ret = malloc(sizeof(struct node_t));
-    ret->data = NULL;
-    ret->next = NULL;
-    return ret;
-}
-
 void push(struct node_t **_node, void *data)
 {
-    struct node_t *new_node;
-
-    new_node = malloc(sizeof(struct node_t));
-    validate_alloc(new_node);
-
+    struct node_t* new_node = malloc(sizeof(struct node_t));
     new_node->data = data;
-    new_node->next = *_node;
-    *_node = new_node;
+    new_node->next = NULL;
+
+    if (*_node == NULL) {
+        *_node = new_node;
+    } else {
+        struct node_t *cur = *_node;
+        while (cur->next != NULL) {
+            cur = cur->next;
+        }
+
+        cur->next = new_node;
+    }
 }
 
 void *pop(struct node_t **_node)

@@ -13,7 +13,6 @@ typedef struct p_gpu {
     char *hwmon;
 } p_gpu;
 
-struct node_t *new_node();
 void push(struct node_t **_node, void *data);
 void *pop(struct node_t **_node);
 void destroy_node(struct node_t **_node);

@@ -103,9 +103,6 @@ static struct node_t *search_for_gpu(void)
 
     while ((dir = readdir(d_root)) != NULL)
     {
-        if (amdgpu == NULL)
-            amdgpu = new_node();
-
         /**
          * In this if: remove X of ppath and compare.
          * Also, compare if is same length,
