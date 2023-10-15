@@ -15,7 +15,7 @@
 #define FAN_GPU_MANU    1
 #define FAN_GPU_AUTO    2
 
-const int speed_matrix[6][2] = {
+const int speed_matrix[][2] = {
     /* temp - speed percentage */
     {     0,    25},
     {    30,    25},
@@ -24,6 +24,8 @@ const int speed_matrix[6][2] = {
     {    70,    70},
     {    74,   100},
 };
+
+const int fan_steps = (sizeof(speed_matrix) / sizeof(int)) / 2;
 
 void free_pgpu(struct p_gpu *data) {
 
@@ -106,7 +108,7 @@ static int get_thermal(struct node_t *_node) {
  * @speed_matrix: info with thermal and speed
 */
 static int getIndex_Therm(int therm, int index) {
-    if ((index - 1) >= 6)
+    if ((index - 1) >= fan_steps)
         return index;
 
     if (therm > speed_matrix[index][0] &&
