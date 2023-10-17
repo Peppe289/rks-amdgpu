@@ -62,7 +62,7 @@ static int manual_pwm(struct node_t *_node) {
     FILE *fp;
     char path[255];
     int buff;
-    char *hwmon = get_hwmon(_node);
+    const char *hwmon = get_hwmon(_node);
 
     if (hwmon == NULL)
         return -1;
