@@ -46,7 +46,7 @@ static char *validate_amdgpu_path(const char *path)
      * N.B. It seems it is possible to have only one hwmonY in this path.
      */
     if ((d_root = opendir(c_path)) == NULL) {
-        print_err("Error to open %s\n", c_path);
+        errno_printf(1, "Error to open %s", c_path);
         return NULL;
     }
 
@@ -113,7 +113,7 @@ static struct node_t *search_for_gpu(void)
         {
             if ((hwmon = validate_amdgpu_path(dir->d_name)) == NULL)
             {
-                print_info_func("Found non AMDGPU at %s. Skipp\n", dir->d_name);
+                info_printf("Found non AMDGPU at %s. Skipp\n", dir->d_name);
                 continue;
             }
 
@@ -137,8 +137,8 @@ static void show_amdgpu_list(struct node_t *_node)
     while (_node != NULL)
     {
         if (_node->data != NULL) {
-            print_info_func("Save in list root %s node\n", get_root(_node));
-            print_info_func("Save in list hwmon %s node\n", get_hwmon(_node));
+            info_printf("Save in list root %s node\n", get_root(_node));
+            info_printf("Save in list hwmon %s node\n", get_hwmon(_node));
         }
 
         _node = _node->next;
@@ -149,12 +149,12 @@ int main()
 {
     struct node_t *amdgpu;
     if ((amdgpu = search_for_gpu()) == NULL) {
-        print_err("Error to init data\n");
+        err_printf("Error to init data\n");
         destroy_node(&amdgpu);
         exit(-1);
     }
     show_amdgpu_list(amdgpu);
-    print_info("start with pid: %d\n", getpid());
+    info_print("start with pid: %d\n", getpid());
     while (pwm_control(amdgpu)) {
         sleep(2);
     }

@@ -71,7 +71,7 @@ static int manual_pwm(struct node_t *_node) {
     strcat(path, "pwm1_enable"); // for now controll only first node
 
     if ((fp = fopen(path, "r+")) == NULL) {
-        print_err("Error to open %s\n", path);
+        errno_printf(1, "Error to open %s", path);
         return -1;
     }
 
@@ -153,7 +153,7 @@ static int set_speed_matrix(struct node_t *_node) {
     strcat(path, "pwm1"); // for now controll only first node
 
     if ((therm = get_thermal(_node)) < 0) {
-        print_err("Error to get thermal info\n"); // collect temp information
+        errno_printf(1, "Error to get thermal info"); // collect temp information
         return -1;
     }
 
@@ -163,7 +163,7 @@ static int set_speed_matrix(struct node_t *_node) {
     // todo -> get exactly number to put.
     data = u_fanspeed(therm, index);
     data = data * 2.55;
-    print_info_func("Set %d percentage with %d temp\n", data, therm);
+    info_printf("Set %d percentage with %d temp\n", data, therm);
 
     if ((fp = fopen(path, "w+")) == NULL) {
         return -1;
@@ -185,7 +185,7 @@ int pwm_control(struct node_t *_node)
 
     for_each_gpu(temp) {
         if (manual_pwm(_node) < 0) {
-            print_err_func("Error to set manual mode in pwm\n");
+            errno_printf(1, "Error to set manual mode in pwm");
         } else {
             // if it manages to set at least one node to true then you can continue the program.
             rec = 1;
@@ -200,7 +200,7 @@ int pwm_control(struct node_t *_node)
 set_gpu:
     for_each_gpu(temp)
         if (set_speed_matrix(temp) < 0)
-            print_err("Error to set %s node\n", get_root(temp));
+            errno_printf(1, "Error to set %s node", get_root(temp));
     
     return 1;
 }
