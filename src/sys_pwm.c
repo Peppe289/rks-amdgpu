@@ -101,7 +101,7 @@ static int get_thermal(struct node_t *_node) {
     memcpy(path, get_hwmon(_node), strlen(get_hwmon(_node)) + 1);
     strcat(path, "temp1_input"); // for now controll only first node
 
-    if ((fd = open(path, O_WRONLY)) < 0) {
+    if ((fd = open(path, O_RDONLY)) < 0) {
         errno_printf(1, "Error to open %s", path);
         return -1;
     }
