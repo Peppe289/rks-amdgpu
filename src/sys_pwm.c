@@ -124,16 +124,15 @@ static int get_thermal(struct node_t *_node) {
  * get range of percentage with thermal.
  * @speed_matrix: info with thermal and speed
 */
-static int getIndex_Therm(int therm, int index) {
-    if ((index - 1) >= fan_steps)
-        return index;
+static int getIndex_Therm(int therm)
+{
+    for (int index = 0; index < fan_steps - 1; index++)
+    {
+        if (therm > speed_matrix[index][0] && therm < speed_matrix[index + 1][0])
+            return index;
+    }
 
-    if (therm > speed_matrix[index][0] &&
-        therm < speed_matrix[index + 1][0])
-        return index;
-
-    index++;
-    return getIndex_Therm(therm, index);
+    return fan_steps - 1;
 }
 
 /**
@@ -175,7 +174,7 @@ static int set_speed_matrix(struct node_t *_node) {
     }
 
     therm = therm / 1000;
-    index = getIndex_Therm(therm, 0); // get index of matrix for set fan
+    index = getIndex_Therm(therm); // get index of matrix for set fan
 
     // todo -> get exactly number to put.
     data = u_fanspeed(therm, index);
