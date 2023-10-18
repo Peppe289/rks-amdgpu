@@ -57,7 +57,7 @@ const char *get_hwmon(struct node_t *_node) {
 }
 
 static int manual_pwm(struct node_t *_node) {
-    int fd;
+    int fd, ret;
     char path[PATH_MAX];
     char buffer[4];
     const char *hwmon = get_hwmon(_node);
@@ -73,11 +73,12 @@ static int manual_pwm(struct node_t *_node) {
         return -1;
     }
 
-    if (read(fd, buffer, sizeof(buffer)) < -1) {
+    if ((ret = read(fd, buffer, sizeof(buffer))) < -1) {
         errno_printf(1, "Error to read %s", path);
         return -1;
     }
 
+    buffer[ret] = '\0';
     if (atoi(buffer) == FAN_GPU_MANU) {
         close(fd);
         return 0; // already set to manual mode
@@ -94,7 +95,7 @@ static int manual_pwm(struct node_t *_node) {
 }
 
 static int get_thermal(struct node_t *_node) {
-    int fd;
+    int fd, ret;
     char path[PATH_MAX];
     char buffer[10];
 
@@ -106,11 +107,12 @@ static int get_thermal(struct node_t *_node) {
         return -1;
     }
 
-    if (read(fd, buffer, sizeof(buffer)) < 0) {
+    if ((ret = read(fd, buffer, sizeof(buffer))) < 0) {
         errno_printf(1, "Error to read %s", path);
         close(fd);
         return -1;
     }
+    buffer[ret] = '\0';
     close(fd);
     return atoi(buffer);
 }
