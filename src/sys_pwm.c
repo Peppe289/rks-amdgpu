@@ -84,7 +84,7 @@ static int manual_pwm(struct node_t *_node) {
     }
 
     sprintf(buffer, "%d", FAN_GPU_MANU); // set to manual mode
-    if (read(fd, buffer, sizeof(buffer)) < 0) {
+    if (write(fd, buffer, sizeof(buffer)) < 0) {
         errno_printf(1, "Error to set %s", path);
         close(fd);
         return -1;
