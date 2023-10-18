@@ -42,8 +42,7 @@ const char *get_root(struct node_t *_node) {
     struct p_gpu *data = _node->data;
 
     if (data != NULL)
-        if (data->root != NULL)
-            return data->root;
+        return data->root;
 
     return NULL;
 }
@@ -52,8 +51,7 @@ const char *get_hwmon(struct node_t *_node) {
     struct p_gpu *data = _node->data;
 
     if (data != NULL)
-        if (data->hwmon != NULL)
-            return data->hwmon;
+        return data->hwmon;
 
     return NULL;
 }
