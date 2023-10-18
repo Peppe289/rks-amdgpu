@@ -79,7 +79,8 @@ static int manual_pwm(struct node_t *_node) {
     }
 
     buffer[ret] = '\0';
-    if (atoi(buffer) == FAN_GPU_MANU) {
+    sscanf(buffer, "%d", &ret);
+    if (ret == FAN_GPU_MANU) {
         close(fd);
         return 0; // already set to manual mode
     }
@@ -114,7 +115,8 @@ static int get_thermal(struct node_t *_node) {
     }
     buffer[ret] = '\0';
     close(fd);
-    return atoi(buffer);
+    sscanf(buffer, "%d", &ret);
+    return ret;
 }
 
 /**
