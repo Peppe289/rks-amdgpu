@@ -6,6 +6,11 @@
 #include <string.h>
 #include <errno.h>
 
+#ifdef PATH_MAX
+#undef PATH_MAX
+#endif
+#define PATH_MAX    (100)
+
 #define err_print(...) fprintf(stderr, __VA_ARGS__);
 #define info_print(...) fprintf(stdout, __VA_ARGS__);
 

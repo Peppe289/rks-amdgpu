@@ -23,7 +23,7 @@ static char *validate_amdgpu_path(const char *path)
 {
     DIR *d_root;
     struct dirent *dir;
-    char c_path[255] = {0};
+    char c_path[PATH_MAX] = {0};
     size_t length;
     FILE *fp;
     char s_data[32];

@@ -60,7 +60,7 @@ const char *get_hwmon(struct node_t *_node) {
 
 static int manual_pwm(struct node_t *_node) {
     int fd;
-    char path[255];
+    char path[PATH_MAX];
     char buffer[4];
     const char *hwmon = get_hwmon(_node);
 
@@ -97,7 +97,7 @@ static int manual_pwm(struct node_t *_node) {
 
 static int get_thermal(struct node_t *_node) {
     FILE *fp;
-    char path[255];
+    char path[PATH_MAX];
     int buff;
 
     memcpy(path, get_hwmon(_node), strlen(get_hwmon(_node)) + 1);
@@ -154,7 +154,7 @@ static int u_fanspeed(int therm, int index) {
 
 static int set_speed_matrix(struct node_t *_node) {
     FILE *fp;
-    char path[255];
+    char path[PATH_MAX];
     int data, therm, index;
 
     memcpy(path, get_hwmon(_node), strlen(get_hwmon(_node)) + 1);
