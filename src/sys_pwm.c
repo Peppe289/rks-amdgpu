@@ -85,6 +85,7 @@ static int manual_pwm(struct node_t *_node) {
         return 0; // already set to manual mode
     }
 
+    memset(buffer, 0, sizeof(buffer)); // clear buffer
     sprintf(buffer, "%d", FAN_GPU_MANU); // set to manual mode
     if (write(fd, buffer, sizeof(buffer)) < 0) {
         errno_printf(1, "Error to set %s", path);
