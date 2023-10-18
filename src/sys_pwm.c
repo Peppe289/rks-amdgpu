@@ -94,19 +94,25 @@ static int manual_pwm(struct node_t *_node) {
 }
 
 static int get_thermal(struct node_t *_node) {
-    FILE *fp;
+    int fd;
     char path[PATH_MAX];
-    int buff;
+    char buffer[10];
 
     memcpy(path, get_hwmon(_node), strlen(get_hwmon(_node)) + 1);
     strcat(path, "temp1_input"); // for now controll only first node
 
-    if ((fp = fopen(path, "r")) == NULL)
+    if ((fd = open(path, O_WRONLY)) < 0) {
+        errno_printf(1, "Error to open %s", path);
         return -1;
+    }
 
-    fscanf(fp, "%d", &buff);
-    fclose(fp);
-    return buff;
+    if (read(fd, buffer, sizeof(buffer)) < 0) {
+        errno_printf(1, "Error to read %s", path);
+        close(fd);
+        return -1;
+    }
+    close(fd);
+    return atoi(buffer);
 }
 
 /**
