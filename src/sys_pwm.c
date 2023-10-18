@@ -59,9 +59,9 @@ const char *get_hwmon(struct node_t *_node) {
 }
 
 static int manual_pwm(struct node_t *_node) {
-    FILE *fp;
+    int fd;
     char path[255];
-    int buff;
+    char buffer[4];
     const char *hwmon = get_hwmon(_node);
 
     if (hwmon == NULL)
@@ -70,21 +70,29 @@ static int manual_pwm(struct node_t *_node) {
     memcpy(path, hwmon, strlen(hwmon) + 1);
     strcat(path, "pwm1_enable"); // for now controll only first node
 
-    if ((fp = fopen(path, "r+")) == NULL) {
+    if ((fd = open(path, O_WRONLY)) < 0) {
         errno_printf(1, "Error to open %s", path);
         return -1;
     }
 
-    fscanf(fp, "%d", &buff);
+    if (read(fd, buffer, sizeof(buffer)) < -1) {
+        errno_printf(1, "Error to read %s", path);
+        return -1;
+    }
 
-    if (buff == FAN_GPU_MANU) {
-        fclose(fp);
+    if (atoi(buffer) == FAN_GPU_MANU) {
+        close(fd);
         return 0; // already set to manual mode
     }
 
-    buff = fprintf(fp, "%d", FAN_GPU_MANU); // set to manual mode
-    fclose(fp);
-    return buff;
+    sprintf(buffer, "%d", FAN_GPU_MANU); // set to manual mode
+    if (read(fd, buffer, sizeof(buffer)) < 0) {
+        errno_printf(1, "Error to set %s", path);
+        close(fd);
+        return -1;
+    }
+    close(fd);
+    return 0;
 }
 
 static int get_thermal(struct node_t *_node) {
