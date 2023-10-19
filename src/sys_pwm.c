@@ -59,7 +59,7 @@ const char *get_hwmon(struct node_t *_node) {
 static int manual_pwm(struct node_t *_node) {
     int fd, ret;
     char path[PATH_MAX];
-    char buffer[4];
+    char buffer[10] = {0};
     const char *hwmon = get_hwmon(_node);
 
     if (hwmon == NULL)
@@ -191,33 +191,22 @@ static int set_speed_matrix(struct node_t *_node) {
     return 0;
 }
 
-int pwm_control(struct node_t *_node)
-{
-    static short int rec = 0;
-    struct node_t *temp = _node;
+void pwm_init(struct node_t *_node) {
 
-    if (rec != 0)
-        goto set_gpu;
-
-    for_each_gpu(temp) {
-        if (manual_pwm(_node) < 0) {
+    for_each_gpu(_node) {
+        if (manual_pwm(_node) < 0)
             errno_printf(1, "Error to set manual mode in pwm");
-        } else {
-            // if it manages to set at least one node to true then you can continue the program.
-            rec = 1;
-        }
     }
 
-    if (rec != 1)
-        return 0;
+    pwm_control(_node);   
+}
 
-    temp = _node;
+int pwm_control(struct node_t *_node)
+{
+    for_each_gpu(_node)
+        if (set_speed_matrix(_node) < 0)
+            errno_printf(1, "Error to set %s node", get_root(_node));
 
-set_gpu:
-    for_each_gpu(temp)
-        if (set_speed_matrix(temp) < 0)
-            errno_printf(1, "Error to set %s node", get_root(temp));
-    
     return 1;
 }
 

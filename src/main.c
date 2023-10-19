@@ -155,6 +155,7 @@ int main()
     }
     show_amdgpu_list(amdgpu);
     info_print("start with pid: %d\n", getpid());
+    pwm_init(amdgpu);
     while (pwm_control(amdgpu)) {
         sleep(2);
     }
