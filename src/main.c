@@ -147,6 +147,7 @@ static void show_amdgpu_list(struct node_t *_node)
 
 int main()
 {
+    int ret;
     struct node_t *amdgpu;
     if ((amdgpu = search_for_gpu()) == NULL) {
         err_printf("Error to init data\n");
@@ -155,8 +156,8 @@ int main()
     }
     show_amdgpu_list(amdgpu);
     info_print("start with pid: %d\n", getpid());
-    pwm_init(amdgpu);
-    while (pwm_control(amdgpu)) {
+    ret = pwm_init(amdgpu);
+    while (pwm_control(amdgpu) && ret) {
         sleep(2);
     }
     destroy_node(&amdgpu);

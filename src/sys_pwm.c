@@ -191,22 +191,30 @@ static int set_speed_matrix(struct node_t *_node) {
     return 0;
 }
 
-void pwm_init(struct node_t *_node) {
+int pwm_init(struct node_t *_node) {
+    int ret = 0;
 
     for_each_gpu(_node) {
-        if (manual_pwm(_node) < 0)
+        if (manual_pwm(_node) < 0) {
             errno_printf(1, "Error to set manual mode in pwm");
+        } else
+            ret = 1;
     }
 
-    pwm_control(_node);   
+    return ret;
 }
 
 int pwm_control(struct node_t *_node)
 {
-    for_each_gpu(_node)
-        if (set_speed_matrix(_node) < 0)
-            errno_printf(1, "Error to set %s node", get_root(_node));
+    int ret = 0;
 
-    return 1;
+    for_each_gpu(_node) {
+        if (set_speed_matrix(_node) < 0) {
+            errno_printf(1, "Error to set %s node", get_root(_node));
+        } else
+            ret = 1;
+    }
+
+    return ret;
 }
 
