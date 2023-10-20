@@ -4,6 +4,7 @@
 #include <string.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #include "data_struct.h"
 #include "utils.h"
@@ -25,7 +26,7 @@ static char *validate_amdgpu_path(const char *path)
     struct dirent *dir;
     char c_path[PATH_MAX] = {0};
     size_t length;
-    FILE *fp;
+    int fd;
     char s_data[32];
     char *hwmon;
 
@@ -65,15 +66,20 @@ static char *validate_amdgpu_path(const char *path)
     strcpy(hwmon, c_path); // copy path of hwmon for return
     strcat(c_path, "name"); // end create path
 
-    if ((fp = fopen(c_path, "r")) == NULL) {
+    if ((fd = open(c_path, O_RDONLY)) < 0 ) {
         free(hwmon);
         return NULL;
     }
 
-    fscanf(fp, "%s", s_data);
-    fclose(fp);
+    if ((length = read(fd, s_data, sizeof(s_data) - 1)) < 0) {
+        free(hwmon);
+        close(fd);
+        return NULL;
+    }
+    s_data[length] = '\0';
+    close(fd);
 
-    if (strcmp(s_data, "amdgpu") == 0)
+    if (strncmp(s_data, "amdgpu", strlen("amdgpu")) == 0)
         return hwmon;
 
     free(hwmon);
