@@ -25,7 +25,7 @@ const int speed_matrix[][2] = {
     {    74,   100},
 };
 
-const int fan_steps = (sizeof(speed_matrix) / sizeof(int)) / 2;
+const int fan_steps = sizeof(speed_matrix) / sizeof(speed_matrix[0]);
 
 void free_pgpu(struct p_gpu *data) {
 
