@@ -161,8 +161,9 @@ static int u_fanspeed(int therm, int index) {
 }
 
 static int set_speed_matrix(struct node_t *_node) {
-    FILE *fp;
+    int fd;
     char path[PATH_MAX];
+    char buff[10] = {0};
     int data, therm, index;
 
     memcpy(path, get_hwmon(_node), strlen(get_hwmon(_node)) + 1);
@@ -181,13 +182,17 @@ static int set_speed_matrix(struct node_t *_node) {
     data = data * 2.55;
     info_printf("Set %d percentage with %d temp\n", data, therm);
 
-    if ((fp = fopen(path, "w+")) == NULL) {
+    if ((fd = open(path, O_WRONLY)) < 0) {
         return -1;
     }
-    
-    fprintf(fp, "%d", data);
-    fclose(fp);
 
+    sprintf(buff, "%d", data);
+    if (write(fd, buff, strlen(buff) + 1) < 0) {
+        close(fd);
+        return -1;
+    }
+
+    close(fd);
     return 0;
 }
 
