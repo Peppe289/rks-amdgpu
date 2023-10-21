@@ -30,10 +30,7 @@ static char *validate_amdgpu_path(const char *path)
     char s_data[32];
     char *hwmon;
 
-    // sscanf(path, "/sys/class/drm/%s/device/hwmon/", c_path);
-    strcat(c_path, "/sys/class/drm/");
-    strcat(c_path, path);
-    strcat(c_path, "/device/hwmon/");
+    sprintf(c_path, "%s%s/device/hwmon/", (char *)def_gpu_path, path);
     length = strlen(c_path);
 
     /**
@@ -61,10 +58,10 @@ static char *validate_amdgpu_path(const char *path)
     }
 
     closedir(d_root);
-    strcat(c_path, "/");
-    hwmon = malloc((strlen(c_path) + 1) * sizeof(char));
-    strcpy(hwmon, c_path); // copy path of hwmon for return
-    strcat(c_path, "name"); // end create path
+
+    hwmon = malloc((strlen(c_path) + 2) * sizeof(char));
+    sprintf(hwmon, "%s/", c_path); // copy path of hwmon for return
+    strcat(c_path, "/name"); // end create path
 
     if ((fd = open(c_path, O_RDONLY)) < 0 ) {
         free(hwmon);
