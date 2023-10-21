@@ -68,12 +68,12 @@ static int manual_pwm(struct node_t *_node) {
     memcpy(path, hwmon, strlen(hwmon) + 1);
     strcat(path, "pwm1_enable"); // for now controll only first node
 
-    if ((fd = open(path, O_WRONLY)) < 0) {
+    if ((fd = open(path, O_RDWR)) < 0) {
         errno_printf(1, "Error to open %s", path);
         return -1;
     }
 
-    if ((ret = read(fd, buffer, sizeof(buffer))) < -1) {
+    if ((ret = read(fd, buffer, sizeof(buffer))) < 0) {
         errno_printf(1, "Error to read %s", path);
         return -1;
     }
@@ -128,7 +128,7 @@ static int getIndex_Therm(int therm)
 {
     for (int index = 0; index < fan_steps - 1; index++)
     {
-        if (therm > speed_matrix[index][0] && therm < speed_matrix[index + 1][0])
+        if (therm > speed_matrix[index][0] && therm <= speed_matrix[index + 1][0])
             return index;
     }
 
