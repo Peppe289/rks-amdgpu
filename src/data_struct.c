@@ -6,17 +6,20 @@
 
 void push(struct node_t **_node, void *data)
 {
-    struct node_t* new_node = malloc(sizeof(struct node_t));
+    struct node_t *new_node = malloc(sizeof(struct node_t));
     new_node->data = data;
     new_node->next = NULL;
 
-    if (*_node == NULL) {
+    if (*_node == NULL)
+    {
         *_node = new_node;
-    } else {
+    }
+    else
+    {
         struct node_t *cur = *_node;
-        while (cur->next != NULL) {
+
+        while (cur->next != NULL)
             cur = cur->next;
-        }
 
         cur->next = new_node;
     }
@@ -25,12 +28,10 @@ void push(struct node_t **_node, void *data)
 void *pop(struct node_t **_node)
 {
     void *retval = NULL;
-    node_t *next_node = NULL;
+    struct node_t *next_node = NULL;
 
     if (*_node == NULL)
-    {
         return NULL;
-    }
 
     next_node = (*_node)->next;
     retval = (*_node)->data;
@@ -42,12 +43,12 @@ void *pop(struct node_t **_node)
 
 void destroy_node(struct node_t **_node)
 {
-    struct node_t *current = *_node;
-    struct node_t *next;
+    struct node_t *next, *current = *_node;
 
     while (current != NULL)
     {
         next = current->next;
+
         if (current->data != NULL)
             free_pgpu(current->data);
 

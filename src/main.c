@@ -24,11 +24,9 @@ static char *validate_amdgpu_path(const char *path)
 {
     DIR *d_root;
     struct dirent *dir;
-    char c_path[PATH_MAX] = {0};
     size_t length;
     int fd;
-    char s_data[32];
-    char *hwmon;
+    char s_data[32], c_path[PATH_MAX] = {0}, *hwmon;
 
     sprintf(c_path, "%s%s/device/hwmon/", (char *)def_gpu_path, path);
     length = strlen(c_path);
@@ -43,7 +41,8 @@ static char *validate_amdgpu_path(const char *path)
      *
      * N.B. It seems it is possible to have only one hwmonY in this path.
      */
-    if ((d_root = opendir(c_path)) == NULL) {
+    if ((d_root = opendir(c_path)) == NULL)
+    {
         errno_printf(1, "Error to open %s", c_path);
         return NULL;
     }
@@ -61,18 +60,21 @@ static char *validate_amdgpu_path(const char *path)
 
     hwmon = malloc((strlen(c_path) + 2) * sizeof(char));
     sprintf(hwmon, "%s/", c_path); // copy path of hwmon for return
-    strcat(c_path, "/name"); // end create path
+    strcat(c_path, "/name");       // end create path
 
-    if ((fd = open(c_path, O_RDONLY)) < 0 ) {
+    if ((fd = open(c_path, O_RDONLY)) < 0)
+    {
         free(hwmon);
         return NULL;
     }
 
-    if ((length = read(fd, s_data, sizeof(s_data) - 1)) < 0) {
+    if ((length = read(fd, s_data, sizeof(s_data) - 1)) < 0)
+    {
         free(hwmon);
         close(fd);
         return NULL;
     }
+
     s_data[length] = '\0';
     close(fd);
 
@@ -139,7 +141,8 @@ static void show_amdgpu_list(struct node_t *_node)
 {
     while (_node != NULL)
     {
-        if (_node->data != NULL) {
+        if (_node->data != NULL)
+        {
             info_printf("Save in list root %s node\n", get_root(_node));
             info_printf("Save in list hwmon %s node\n", get_hwmon(_node));
         }
@@ -152,17 +155,21 @@ int main()
 {
     int ret;
     struct node_t *amdgpu;
-    if ((amdgpu = search_for_gpu()) == NULL) {
+
+    if ((amdgpu = search_for_gpu()) == NULL)
+    {
         err_printf("Error to init data\n");
         destroy_node(&amdgpu);
         exit(-1);
     }
+
     show_amdgpu_list(amdgpu);
     info_print("start with pid: %d\n", getpid());
     ret = pwm_init(amdgpu);
-    while (pwm_control(amdgpu) && ret) {
+
+    while (pwm_control(amdgpu) && ret)
         sleep(2);
-    }
+
     destroy_node(&amdgpu);
 
     return EXIT_SUCCESS;
