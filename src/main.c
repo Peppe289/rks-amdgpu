@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
     uint32_t set_pwm = -1, *set_fan = NULL;
 
     struct argparse_option option[] = {
-        OPT_INT(OPT_SET_PWM, "set-pwm", &set_pwm, "this set pwm mode to [auto : 2], [manual : 1], [full : 0]"),
+        OPT_INT(OPT_SET_PWM_MODE, "set-pwm", &set_pwm, "this set pwm mode to [auto : 2], [manual : 1], [full : 0]"),
         //OPT_INT_ARR(OPT_SET_FAN,"set-fan", &set_fan, "with this you can create a array to set fan speed table. --set-fan={<temp>:<speed>},{...}"),
         OPT_END(),
     };

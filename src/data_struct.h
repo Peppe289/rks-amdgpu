@@ -31,7 +31,7 @@ typedef struct argparse {
 } argparse;
 
 typedef enum opt_id {
-	OPT_SET_PWM = 0,
+	OPT_SET_PWM_MODE = 0,
 	OPT_SET_FAN = 1,
 } opt_id;
 

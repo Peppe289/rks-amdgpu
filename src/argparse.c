@@ -33,7 +33,7 @@ int __int_args(struct argparse_option *option,
     int ret;
 
     fptr function[] = {
-        [OPT_SET_PWM] = &pwm_set,
+        [OPT_SET_PWM_MODE] = &pwm_set,
     };
 
     memset(&self, 0, sizeof(struct argparse));
