@@ -1,3 +1,8 @@
+/**
+ * Is used to manage the ADT list.
+ * It is the module that allows you to save
+ * the paths of the AMD GPUs found.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 
