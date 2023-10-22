@@ -5,6 +5,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <stdint.h>
 
 #include "data_struct.h"
 #include "utils.h"
@@ -151,10 +152,18 @@ static void show_amdgpu_list(struct node_t *_node)
     }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
     int ret;
     struct node_t *amdgpu;
+
+    uint32_t set_pwm = -1, *set_fan = NULL;
+
+    struct argparse_option option[] = {
+        OPT_INT(OPT_SET_PWM, "set-pwm", &set_pwm, "this set pwm mode to [auto : 2], [manual : 1], [full : 0]"),
+        //OPT_INT_ARR(OPT_SET_FAN,"set-fan", &set_fan, "with this you can create a array to set fan speed table. --set-fan={<temp>:<speed>},{...}"),
+        OPT_END(),
+    };
 
     if ((amdgpu = search_for_gpu()) == NULL)
     {
@@ -164,13 +173,19 @@ int main()
     }
 
     show_amdgpu_list(amdgpu);
+
+    if (__int_args(option, amdgpu, argc, argv)) {
+        // args found, and already set.
+        goto exit;
+    }
+
     info_print("start with pid: %d\n", getpid());
     ret = pwm_init(amdgpu);
 
     while (pwm_control(amdgpu) && ret)
         sleep(2);
 
+exit:
     destroy_node(&amdgpu);
-
     return EXIT_SUCCESS;
 }

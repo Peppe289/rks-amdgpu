@@ -59,7 +59,7 @@ const char *get_hwmon(struct node_t *_node)
     return NULL;
 }
 
-static int manual_pwm(struct node_t *_node)
+static int manual_pwm(struct node_t *_node, int mode)
 {
     int fd, ret;
     char path[PATH_MAX], buffer[10] = {0};
@@ -86,14 +86,14 @@ static int manual_pwm(struct node_t *_node)
     buffer[ret] = '\0';
     sscanf(buffer, "%d", &ret);
 
-    if (ret == FAN_GPU_MANU)
+    if (ret == mode)
     {
         close(fd);
-        return 0; // already set to manual mode
+        return 0; // already set to @mode
     }
 
     memset(buffer, 0, sizeof(buffer));   // clear buffer
-    sprintf(buffer, "%d", FAN_GPU_MANU); // set to manual mode
+    sprintf(buffer, "%d", mode); // set to @mode
 
     if (write(fd, buffer, sizeof(buffer)) < 0)
     {
@@ -104,6 +104,12 @@ static int manual_pwm(struct node_t *_node)
 
     close(fd);
     return 0;
+}
+
+int pwm_set(struct node_t *_node, const char *mode) {
+    int set;
+    sscanf(mode, "%d", &set);
+    return manual_pwm(_node, set);
 }
 
 static int get_thermal(struct node_t *_node)
@@ -217,7 +223,7 @@ int pwm_init(struct node_t *_node)
 
     for_each_gpu(_node)
     {
-        if (manual_pwm(_node) < 0)
+        if (manual_pwm(_node, FAN_GPU_MANU) < 0)
         {
             errno_printf(1, "Error to set manual mode in pwm");
         }
