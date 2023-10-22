@@ -44,9 +44,9 @@ typedef struct argparse_option {
 
 typedef int (*fptr)(struct node_t *, const char *);
 
-#define OPT_STRING(...)		{ARG_PARSE_STRING, __VA_ARGS__}
-#define OPT_INT(...)		{ARG_PARSE_INT, __VA_ARGS__}
-#define OPT_INT_ARR(...)	{ARG_PARSE_INT_ARRAY, __VA_ARGS__}
+#define OPT_STRING(x, ...)	[x] =	{ARG_PARSE_STRING, x, __VA_ARGS__}
+#define OPT_INT(x, ...)		[x] = {ARG_PARSE_INT, x, __VA_ARGS__}
+#define OPT_INT_ARR(x, ...)	[x] = {ARG_PARSE_INT_ARRAY, x, __VA_ARGS__}
 #define OPT_END()			{ARG_PARSE_END, -1, NULL, NULL}
 
 void push(struct node_t **_node, void *data);
