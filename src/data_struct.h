@@ -39,7 +39,6 @@ typedef struct argparse_option {
 	enum argparse_option_type type;
 	enum opt_id id;
 	const char *long_name;
-	void *value;
 	const char *help;
 } argparse_option;
 
@@ -48,7 +47,7 @@ typedef int (*fptr)(struct node_t *, const char *);
 #define OPT_STRING(...)		{ARG_PARSE_STRING, __VA_ARGS__}
 #define OPT_INT(...)		{ARG_PARSE_INT, __VA_ARGS__}
 #define OPT_INT_ARR(...)	{ARG_PARSE_INT_ARRAY, __VA_ARGS__}
-#define OPT_END()			{ARG_PARSE_END, -1, NULL, NULL, NULL}
+#define OPT_END()			{ARG_PARSE_END, -1, NULL, NULL}
 
 void push(struct node_t **_node, void *data);
 void *pop(struct node_t **_node);
