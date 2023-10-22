@@ -30,7 +30,7 @@ int __int_args(struct argparse_option *option,
     struct argparse self;
     char *arg;
     char calc_arg[PATH_MAX] = {0};
-    int ret;
+    int ret, exit_val;
 
     fptr function[] = {
         [OPT_SET_PWM_MODE] = &pwm_set,
@@ -60,7 +60,9 @@ int __int_args(struct argparse_option *option,
         switch (verify_option_arg(option, calc_arg, &ret))
         {
             case ARG_PARSE_INT:
-                function[ret](amdgpu, calc_arg);
+                exit_val = function[ret](amdgpu, calc_arg);
+                if (exit_val < 0)
+                    return exit_val;
                 break;
             case ARG_PARSE_INT_ARRAY:
 

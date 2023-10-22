@@ -172,18 +172,21 @@ int main(int argc, char *argv[])
 
     show_amdgpu_list(amdgpu);
 
-    if (__int_args(option, amdgpu, argc, argv)) {
+    if ((ret = __int_args(option, amdgpu, argc, argv)) != 0) {
         // args found, and already set.
+        ret = ~ret;
         goto exit;
     }
 
     info_print("start with pid: %d\n", getpid());
     ret = pwm_init(amdgpu);
+    if (!ret)
+        goto exit;
 
-    while (pwm_control(amdgpu) && ret)
+    while ((ret = pwm_control(amdgpu)) != 0)
         sleep(2);
 
 exit:
     destroy_node(&amdgpu);
-    return EXIT_SUCCESS;
+    return !ret;
 }
