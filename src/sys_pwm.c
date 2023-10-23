@@ -11,10 +11,6 @@
 #include "data_struct.h"
 #include "utils.h"
 
-#define FAN_GPU_FULL 0
-#define FAN_GPU_MANU 1
-#define FAN_GPU_AUTO 2
-
 int speed_matrix[][6] = {
     {0, 30, 50, 60, 70, 74}, // temp
     {25, 25, 30, 40, 70, 100}, // speed
@@ -218,7 +214,7 @@ int pwm_init(struct node_t *_node)
 
     for_each_gpu(_node)
     {
-        if (manual_pwm(_node, FAN_GPU_MANU) < 0)
+        if (manual_pwm(_node, AMD_FAN_CTRL_MANUAL) < 0)
         {
             errno_printf(1, "Error to set manual mode in pwm");
         }

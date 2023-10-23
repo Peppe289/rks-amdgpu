@@ -36,6 +36,23 @@ typedef enum argparse_option_type {
 	ARG_PARSE_END,
 } argparse_option_type;
 
+/**
+ * Fan mode.
+ * 
+ * AMD_FAN_CTRL_NODE: No fan control, therefore the
+ * speed is static at maximum.
+ * 
+ * AMD_FAN_CTRL_MANUAL: You can set the speed from pwm.
+ * 
+ * AMD_FAN_CTRL_AUTO: You have no control over the fans,
+ * all control is given to the kernel.
+ */
+typedef enum amd_fan_ctrl_mode {
+	AMD_FAN_CTRL_NONE = 0,
+	AMD_FAN_CTRL_MANUAL = 1,
+	AMD_FAN_CTRL_AUTO = 2,
+} amd_fan_ctrl_mode;
+
 /* Not properly used, will be dropped when the code is stable. */
 typedef struct argparse {
 	enum argparse_option_type type;	
