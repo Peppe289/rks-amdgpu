@@ -201,8 +201,8 @@ static int set_speed_matrix(struct node_t *_node, struct amdgpu_fan1 *fan_speed)
     index = getIndex_Therm(therm, fan_speed); // get index of matrix for set fan
 
     data = u_fanspeed(therm, index, fan_speed);
-    data = data * 2.55;
     info_printf("Set %d percentage with %d temp\n", data, therm);
+    data = data * 2.55;
 
     if ((fd = open(path, O_WRONLY)) < 0)
     {
