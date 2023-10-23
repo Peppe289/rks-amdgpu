@@ -110,6 +110,7 @@ int __int_args(struct argparse_option *option, struct node_t *amdgpu,
 
     fptr function[] = {
         [OPT_SET_PWM_MODE] = &pwm_set,
+        [OPT_SET_FAN] = NULL,
     };
 
     memset(&self, 0, sizeof(struct argparse));
@@ -141,11 +142,13 @@ int __int_args(struct argparse_option *option, struct node_t *amdgpu,
                     return exit_val;
                 break;
             case ARG_PARSE_INT_ARRAY:
-                exit_val = init_fan1_speed(fan_speed, calc_arg);
-                if (exit_val < 0) {
-                    return exit_val;
-                } else {
-                    return 0; // in this case, continue
+                if (ret == OPT_SET_FAN) {
+                    exit_val = init_fan1_speed(fan_speed, calc_arg);
+                    if (exit_val < 0) {
+                        return exit_val;
+                    } else {
+                        return 0; // in this case, continue
+                    }
                 }
                 break;
             default:
