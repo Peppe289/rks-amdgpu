@@ -88,7 +88,21 @@ typedef struct argparse_option {
 	const char *help;
 } argparse_option;
 
-typedef int (*fptr)(struct node_t *, const char *);
+/**
+ * Composes an array with the manual values
+ * ​​that the user wants to have for fan control.
+ * 
+ * @thermal: Reported temperature
+ * 
+ * @fan_speed: In relation to the temperature,
+ * it sets the speed. (It is marked as a percentage).
+ */
+typedef struct amdgpu_fan1 {
+	int thermal;
+	int fan_speed;
+} amdgpu_fan1;
+
+typedef int (*fptr)(struct node_t *, void *);
 
 #define OPT_STRING(x, ...)	[x] =	{ARG_PARSE_STRING, x, __VA_ARGS__}
 #define OPT_INT(x, ...)		[x] = {ARG_PARSE_INT, x, __VA_ARGS__}
@@ -103,11 +117,12 @@ const char *get_root(struct node_t *_node);
 const char *get_hwmon(struct node_t *_node);
 void free_pgpu(struct p_gpu *data);
 int pwm_init(struct node_t *_node);
-int pwm_control(struct node_t *_node);
+int pwm_control(struct node_t *_node, struct amdgpu_fan1 **fan_speed);
 
 /* These functions help manage input arguments. */
-int __int_args(struct argparse_option *option,
-				struct node_t *amdgpu, int argc, char *argv[]);
-int pwm_set(struct node_t *_node, const char *mode);
+int __int_args(struct argparse_option *option, struct node_t *amdgpu,
+				struct amdgpu_fan1 **fan_speed, int argc, char *argv[]);
+int pwm_set(struct node_t *_node, void *mode);
+int init_fan1_speed(struct amdgpu_fan1 **fan_speed, void *data);
 
 #endif // _RKS_DATA_STRUCT_H__

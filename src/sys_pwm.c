@@ -11,7 +11,7 @@
 #include "data_struct.h"
 #include "utils.h"
 
-int speed_matrix[][6] = {
+const int speed_default[][6] = {
     {0, 30, 50, 60, 70, 74}, // temp
     {25, 25, 30, 40, 70, 100}, // speed
 };
@@ -97,9 +97,10 @@ static int manual_pwm(struct node_t *_node, int mode)
     return 0;
 }
 
-int pwm_set(struct node_t *_node, const char *mode) {
+int pwm_set(struct node_t *_node, void *mode) {
     int set;
-    sscanf(mode, "%d", &set);
+    const char *ptr = mode;
+    sscanf(ptr, "%d", &set);
 
     if (!(set <= AMD_FAN_CTRL_AUTO)) {
         err_printf("Error to set pwm_mode: illegal value\n");
@@ -139,15 +140,21 @@ static int get_thermal(struct node_t *_node)
  * get range of percentage with thermal.
  * @speed_matrix: info with thermal and speed
  */
-static int getIndex_Therm(int therm)
+static int getIndex_Therm(int therm, struct amdgpu_fan1 *fan_speed)
 {
-    for (int index = 0; index < FAN_STEPS - 1; index++)
+    int step, index;
+
+    // find limit
+    for (step = 0; (fan_speed[step].thermal != -1) &&
+            (fan_speed[step].fan_speed != -1); step++);
+
+    for (index = 0; index < step - 1; index++)
     {
-        if (therm > speed_matrix[0][index] && therm <= speed_matrix[0][index + 1])
+        if (therm > fan_speed[index].thermal && therm <= fan_speed[index + 1].thermal)
             return index;
     }
 
-    return FAN_STEPS - 1;
+    return step - 1;
 }
 
 /**
@@ -163,12 +170,12 @@ static int getIndex_Therm(int therm)
  *
  * Forget it, it's just math stuff.
  */
-static int u_fanspeed(int therm, int index)
+static int u_fanspeed(int therm, int index, struct amdgpu_fan1 *fan_speed)
 {
-    int x1 = speed_matrix[0][index];
-    int x2 = speed_matrix[0][index + 1];
-    int y1 = speed_matrix[1][index];
-    int y2 = speed_matrix[1][index + 1];
+    int x1 = fan_speed[index].thermal;
+    int x2 = fan_speed[index + 1].thermal;
+    int y1 = fan_speed[index].fan_speed;
+    int y2 = fan_speed[index + 1].fan_speed;
     int x = therm;
     int m = (y2 - y1) / (x2 - x1);
     int q = y1 - m * x1;
@@ -176,7 +183,7 @@ static int u_fanspeed(int therm, int index)
     return m * x + q;
 }
 
-static int set_speed_matrix(struct node_t *_node)
+static int set_speed_matrix(struct node_t *_node, struct amdgpu_fan1 *fan_speed)
 {
     int fd, data, therm, index;
     char path[PATH_MAX], buff[10] = {0};
@@ -191,9 +198,9 @@ static int set_speed_matrix(struct node_t *_node)
     }
 
     therm = therm / 1000;
-    index = getIndex_Therm(therm); // get index of matrix for set fan
+    index = getIndex_Therm(therm, fan_speed); // get index of matrix for set fan
 
-    data = u_fanspeed(therm, index);
+    data = u_fanspeed(therm, index, fan_speed);
     data = data * 2.55;
     info_printf("Set %d percentage with %d temp\n", data, therm);
 
@@ -231,13 +238,40 @@ int pwm_init(struct node_t *_node)
     return ret;
 }
 
-int pwm_control(struct node_t *_node)
+static struct amdgpu_fan1 *init_amdgpu_fan1_speed(struct amdgpu_fan1 *fan_speed) {
+    int i;
+
+    if (fan_speed != NULL)
+        return fan_speed;
+
+    fan_speed = malloc(sizeof(struct amdgpu_fan1) * (FAN_STEPS + 1));
+
+    for (i = 0; i != FAN_STEPS; ++i) {
+        fan_speed[i].thermal = speed_default[0][i];
+        fan_speed[i].fan_speed = speed_default[1][i];
+    }
+
+    /**
+     * Values ​​agreeing with 1 declare that we are at the
+     * end of the array. it was the most generic way
+     * to declare termination.
+     */    
+    fan_speed[i].thermal = -1;
+    fan_speed[i].fan_speed = -1;
+
+    return fan_speed;
+}
+
+int pwm_control(struct node_t *_node, struct amdgpu_fan1 **fan_speed)
 {
     int ret = 0;
 
+    if (*fan_speed == NULL)
+        *fan_speed = init_amdgpu_fan1_speed(*fan_speed);
+
     for_each_gpu(_node)
     {
-        if (set_speed_matrix(_node) < 0)
+        if (set_speed_matrix(_node, *fan_speed) < 0)
         {
             errno_printf(1, "Error to set %s node", get_root(_node));
         }

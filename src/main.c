@@ -156,10 +156,11 @@ int main(int argc, char *argv[])
 {
     int ret;
     struct node_t *amdgpu;
+    struct amdgpu_fan1 *fan_speed = NULL;
 
     struct argparse_option option[] = {
         OPT_INT(OPT_SET_PWM_MODE, "set-pwm", "this set pwm mode to [auto : 2], [manual : 1], [full : 0]"),
-        //OPT_INT_ARR(OPT_SET_FAN,"set-fan", &set_fan, "with this you can create a array to set fan speed table. --set-fan={<temp>:<speed>},{...}"),
+        OPT_INT_ARR(OPT_SET_FAN, "set-fan", "with this you can create a array to set fan speed table. --set-fan={<temp>:<speed>},{...}"),
         OPT_END(),
     };
 
@@ -172,7 +173,7 @@ int main(int argc, char *argv[])
 
     show_amdgpu_list(amdgpu);
 
-    if ((ret = __int_args(option, amdgpu, argc, argv)) != 0) {
+    if ((ret = __int_args(option, amdgpu, &fan_speed, argc, argv)) != 0) {
         // args found, and already set.
         ret = ~ret;
         goto exit;
@@ -183,10 +184,11 @@ int main(int argc, char *argv[])
     if (!ret)
         goto exit;
 
-    while ((ret = pwm_control(amdgpu)) != 0)
+    while ((ret = pwm_control(amdgpu, &fan_speed)) != 0)
         sleep(2);
 
 exit:
+    free(fan_speed);
     destroy_node(&amdgpu);
     return !ret;
 }
