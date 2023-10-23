@@ -15,17 +15,12 @@
 #define FAN_GPU_MANU 1
 #define FAN_GPU_AUTO 2
 
-const int speed_matrix[][2] = {
-    /* temp - speed percentage */
-    {0, 25},
-    {30, 25},
-    {50, 30},
-    {60, 40},
-    {70, 70},
-    {74, 100},
+int speed_matrix[][6] = {
+    {0, 30, 50, 60, 70, 74}, // temp
+    {25, 25, 30, 40, 70, 100}, // speed
 };
 
-const int fan_steps = sizeof(speed_matrix) / sizeof(speed_matrix[0]);
+#define FAN_STEPS   6
 
 void free_pgpu(struct p_gpu *data)
 {
@@ -144,13 +139,13 @@ static int get_thermal(struct node_t *_node)
  */
 static int getIndex_Therm(int therm)
 {
-    for (int index = 0; index < fan_steps - 1; index++)
+    for (int index = 0; index < FAN_STEPS - 1; index++)
     {
-        if (therm > speed_matrix[index][0] && therm <= speed_matrix[index + 1][0])
+        if (therm > speed_matrix[0][index] && therm <= speed_matrix[0][index + 1])
             return index;
     }
 
-    return fan_steps - 1;
+    return FAN_STEPS - 1;
 }
 
 /**
@@ -168,10 +163,10 @@ static int getIndex_Therm(int therm)
  */
 static int u_fanspeed(int therm, int index)
 {
-    int x1 = speed_matrix[index][0];
-    int x2 = speed_matrix[index + 1][0];
-    int y1 = speed_matrix[index][1];
-    int y2 = speed_matrix[index + 1][1];
+    int x1 = speed_matrix[0][index];
+    int x2 = speed_matrix[0][index + 1];
+    int y1 = speed_matrix[1][index];
+    int y2 = speed_matrix[1][index + 1];
     int x = therm;
     int m = (y2 - y1) / (x2 - x1);
     int q = y1 - m * x1;
