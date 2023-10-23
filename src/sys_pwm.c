@@ -100,6 +100,12 @@ static int manual_pwm(struct node_t *_node, int mode)
 int pwm_set(struct node_t *_node, const char *mode) {
     int set;
     sscanf(mode, "%d", &set);
+
+    if (!(set <= AMD_FAN_CTRL_AUTO)) {
+        err_printf("Error to set pwm_mode: illegal value\n");
+        return -1;
+    }
+
     return manual_pwm(_node, set);
 }
 
