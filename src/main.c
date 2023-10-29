@@ -187,6 +187,11 @@ int main(int argc, char *argv[])
     while ((ret = pwm_control(amdgpu, &fan_speed)) != 0)
         sleep(2);
 
+    if (running == 0) {
+        info_printf("Exit after ctrl+c");
+        ret = 1;
+    }
+
 exit:
     free(fan_speed);
     destroy_node(&amdgpu);

@@ -11,6 +11,11 @@
 #endif
 #define PATH_MAX    (100)
 
+extern volatile int running;
+void interruptHandler(int dummy);
+
+#define __maybe_not_used __attribute__((unused))
+
 #define err_print(...) fprintf(stderr, __VA_ARGS__);
 #define info_print(...) fprintf(stdout, __VA_ARGS__);
 

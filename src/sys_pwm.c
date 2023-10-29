@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#include <signal.h>
 
 #include "data_struct.h"
 #include "utils.h"
@@ -279,5 +280,7 @@ int pwm_control(struct node_t *_node, struct amdgpu_fan1 **fan_speed)
             ret = 1;
     }
 
-    return ret;
+    signal(SIGINT, interruptHandler);
+
+    return ret & running;
 }
