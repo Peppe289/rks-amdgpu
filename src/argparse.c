@@ -15,7 +15,7 @@ enum argparse_option_type verify_option_arg(struct argparse_option *option, char
         length = strlen(option[i].long_name);
         if ((strncmp(option[i].long_name, arg, length) == 0) &&
             (strlen(arg) > (length + 1))) {
-            memcpy(arg, &arg[length + 1], PATH_MAX);
+            memcpy(arg, &arg[length + 1], PATH_MAX - (length + 1));
             *ret = option[i].id;
             return option[i].type;
         }
