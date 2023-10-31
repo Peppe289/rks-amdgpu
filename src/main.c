@@ -26,7 +26,7 @@ static char *validate_amdgpu_path(const char *path)
     DIR *d_root;
     struct dirent *dir;
     size_t length;
-    int fd;
+    int fd, ret;
     char s_data[32], c_path[PATH_MAX] = {0}, *hwmon;
 
     sprintf(c_path, "%s%s/device/hwmon/", (char *)def_gpu_path, path);
@@ -69,13 +69,14 @@ static char *validate_amdgpu_path(const char *path)
         return NULL;
     }
 
-    if ((length = read(fd, s_data, sizeof(s_data) - 1)) < 0)
+    if ((ret = read(fd, s_data, sizeof(s_data) - 1)) < 0)
     {
         free(hwmon);
         close(fd);
         return NULL;
     }
 
+    length = ret;
     s_data[length] = '\0';
     close(fd);
 
